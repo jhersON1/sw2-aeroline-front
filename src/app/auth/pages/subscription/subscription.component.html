@@ -1,0 +1,314 @@
+<main class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Cabecera -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Registro de Aerolínea</h1>
+            <p class="mt-2 text-gray-600">Complete los siguientes pasos para registrar su aerolínea en nuestra
+                plataforma</p>
+        </div>
+
+        <!-- Indicador de pasos -->
+        <div class="mb-10">
+            <div class="flex justify-between">
+                @for (step of [1, 2, 3]; track step) {
+                <div class="flex flex-col items-center">
+                    <div [class]="'rounded-full w-10 h-10 flex items-center justify-center ' + 
+                          (currentStep() >= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600')">
+                        {{ step }}
+                    </div>
+                    <span class="text-sm mt-2"
+                        [class]="currentStep() >= step ? 'text-blue-600 font-medium' : 'text-gray-500'">
+                        {{ step === 1 ? 'Datos de la aerolínea' : step === 2 ? 'Datos del administrador' : 'Pago' }}
+                    </span>
+                </div>
+
+                @if (step < 3) { <div class="flex-1 flex items-center">
+                    <div [class]="'h-1 w-full ' + (currentStep() > step ? 'bg-blue-600' : 'bg-gray-200')"></div>
+            </div>
+            }
+            }
+        </div>
+    </div>
+
+    <!-- Contenedor para los formularios -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        @if (submissionSuccess()) {
+        <!-- Mensaje de éxito -->
+        <div class="p-10 text-center">
+            <div class="mb-6 text-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">¡Registro exitoso!</h2>
+            <p class="text-gray-600 mb-4">Su cuenta de aerolínea ha sido creada correctamente.</p>
+            <p class="text-gray-500">Redirigiendo al inicio de sesión...</p>
+        </div>
+        } @else {
+        <!-- Paso 1: Datos de la aerolínea -->
+        @if (currentStep() === 1) {
+        <div class="p-6 sm:p-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Datos de la aerolínea</h2>
+            <form [formGroup]="airlineForm" class="space-y-6">
+                <div>
+                    <label for="airline_name" class="block text-sm font-medium text-gray-700">Nombre oficial de la
+                        aerolínea <span class="text-red-500">*</span></label>
+                    <input formControlName="airline_name" type="text" id="airline_name"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    @if (airlineForm.get('airline_name')?.invalid && airlineForm.get('airline_name')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">El nombre de la aerolínea es obligatorio</p>
+                    }
+                </div>
+
+                <div>
+                    <label for="alias" class="block text-sm font-medium text-gray-700">Identificador único para URL
+                        <span class="text-red-500">*</span></label>
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <span
+                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            skyair-
+                        </span>
+                        <input formControlName="alias" type="text" id="alias"
+                            class="flex-1 block w-full px-3 py-2 border border-gray-300 rounded-none rounded-r-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    @if (airlineForm.get('alias')?.invalid && airlineForm.get('alias')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">El alias es obligatorio</p>
+                    }
+                </div>
+
+                <div>
+                    <label for="country" class="block text-sm font-medium text-gray-700">País de operación <span
+                            class="text-red-500">*</span></label>
+                    <input formControlName="country" type="text" id="country"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    @if (airlineForm.get('country')?.invalid && airlineForm.get('country')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">El país es obligatorio</p>
+                    }
+                </div>
+
+                <div>
+                    <label for="contact_email" class="block text-sm font-medium text-gray-700">Correo de contacto
+                        institucional <span class="text-red-500">*</span></label>
+                    <input formControlName="contact_email" type="email" id="contact_email"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    @if (airlineForm.get('contact_email')?.invalid && airlineForm.get('contact_email')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">
+                        @if (airlineForm.get('contact_email')?.errors?.['required']) {
+                        El correo electrónico es obligatorio
+                        } @else if (airlineForm.get('contact_email')?.errors?.['email']) {
+                        El formato del correo electrónico no es válido
+                        }
+                    </p>
+                    }
+                </div>
+
+                <div>
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700">Teléfono de contacto
+                        comercial <span class="text-red-500">*</span></label>
+                    <input formControlName="phone_number" type="tel" id="phone_number"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    @if (airlineForm.get('phone_number')?.invalid && airlineForm.get('phone_number')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">El teléfono es obligatorio</p>
+                    }
+                </div>
+            </form>
+        </div>
+        }
+
+        <!-- Paso 2: Datos del administrador -->
+        @if (currentStep() === 2) {
+        <div class="p-6 sm:p-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Datos del usuario administrador</h2>
+            <form [formGroup]="adminForm" class="space-y-6">
+                <div>
+                    <label for="admin_name" class="block text-sm font-medium text-gray-700">Nombre completo del primer
+                        usuario admin <span class="text-red-500">*</span></label>
+                    <input formControlName="admin_name" type="text" id="admin_name"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    @if (adminForm.get('admin_name')?.invalid && adminForm.get('admin_name')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">El nombre del administrador es obligatorio</p>
+                    }
+                </div>
+
+                <div>
+                    <label for="admin_email" class="block text-sm font-medium text-gray-700">Correo para iniciar sesión
+                        <span class="text-red-500">*</span></label>
+                    <input formControlName="admin_email" type="email" id="admin_email"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    @if (adminForm.get('admin_email')?.invalid && adminForm.get('admin_email')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">
+                        @if (adminForm.get('admin_email')?.errors?.['required']) {
+                        El correo electrónico es obligatorio
+                        } @else if (adminForm.get('admin_email')?.errors?.['email']) {
+                        El formato del correo electrónico no es válido
+                        }
+                    </p>
+                    }
+                </div>
+
+                <div>
+                    <label for="admin_password" class="block text-sm font-medium text-gray-700">Contraseña <span
+                            class="text-red-500">*</span></label>
+                    <div class="mt-1 flex items-center">
+                        <input formControlName="admin_password" type="password" id="admin_password"
+                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <span class="ml-2 text-xs text-gray-500">Hasheada por auth-service</span>
+                    </div>
+                    @if (adminForm.get('admin_password')?.invalid && adminForm.get('admin_password')?.touched) {
+                    <p class="mt-1 text-sm text-red-600">
+                        @if (adminForm.get('admin_password')?.errors?.['required']) {
+                        La contraseña es obligatoria
+                        } @else if (adminForm.get('admin_password')?.errors?.['minlength']) {
+                        La contraseña debe tener al menos 8 caracteres
+                        }
+                    </p>
+                    }
+                </div>
+
+                <div>
+                    <label for="admin_phone" class="block text-sm font-medium text-gray-700">Teléfono de contacto del
+                        admin (opcional)</label>
+                    <input formControlName="admin_phone" type="tel" id="admin_phone"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </form>
+        </div>
+        }
+
+        <!-- Paso 3: Datos de pago -->
+        @if (currentStep() === 3) {
+        <div class="p-6 sm:p-8">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Selección de plan y método de pago</h2>
+
+            <!-- Planes de suscripción -->
+            <div class="mb-8">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Plan de suscripción</h3>
+                <div class="border rounded-lg p-6 bg-blue-50 border-blue-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <h4 class="font-bold text-xl text-gray-900">{{ plans[0].name }}</h4>
+                        <span class="text-2xl font-bold text-blue-600">${{ plans[0].price }}</span>
+                    </div>
+
+                    <p class="text-gray-700 mb-4">Todo lo que necesita para gestionar su aerolínea de forma eficiente
+                    </p>
+
+                    <div class="text-gray-700">
+                        @for (feature of plans[0].features; track feature) {
+                        <div class="flex items-center mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2"
+                                viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ feature }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de pago -->
+            <form [formGroup]="paymentForm" class="space-y-6">
+                <h3 class="text-lg font-medium text-gray-900">Información de pago</h3>
+                <div class="bg-gray-50 p-4 rounded-md border border-gray-200 mb-6">
+                    <div class="flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-sm text-gray-600">Esto es solo una simulación, no se realizará ningún cargo
+                            real.</span>
+                    </div>
+
+                    <div>
+                        <label for="card_number" class="block text-sm font-medium text-gray-700">Número de tarjeta <span
+                                class="text-red-500">*</span></label>
+                        <input formControlName="card_number" type="text" id="card_number"
+                            placeholder="1234 5678 9012 3456"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        @if (paymentForm.get('card_number')?.invalid && paymentForm.get('card_number')?.touched) {
+                        <p class="mt-1 text-sm text-red-600">Ingrese un número de tarjeta válido de 16 dígitos</p>
+                        }
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="cardholder_name" class="block text-sm font-medium text-gray-700">Nombre del titular
+                            <span class="text-red-500">*</span></label>
+                        <input formControlName="cardholder_name" type="text" id="cardholder_name"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        @if (paymentForm.get('cardholder_name')?.invalid && paymentForm.get('cardholder_name')?.touched)
+                        {
+                        <p class="mt-1 text-sm text-red-600">El nombre del titular es obligatorio</p>
+                        }
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="expiry_date" class="block text-sm font-medium text-gray-700">Fecha de expiración
+                                <span class="text-red-500">*</span></label>
+                            <input formControlName="expiry_date" type="text" id="expiry_date" placeholder="MM/YY"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            @if (paymentForm.get('expiry_date')?.invalid && paymentForm.get('expiry_date')?.touched) {
+                            <p class="mt-1 text-sm text-red-600">Ingrese una fecha válida (MM/YY)</p>
+                            }
+                        </div>
+                        <div>
+                            <label for="cvv" class="block text-sm font-medium text-gray-700">CVV <span
+                                    class="text-red-500">*</span></label>
+                            <input formControlName="cvv" type="text" id="cvv"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            @if (paymentForm.get('cvv')?.invalid && paymentForm.get('cvv')?.touched) {
+                            <p class="mt-1 text-sm text-red-600">Ingrese un CVV válido</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        }
+
+        <!-- Botones de navegación -->
+        <div class="px-6 sm:px-8 py-4 bg-gray-50 flex justify-between">
+            @if (currentStep() > 1) {
+            <button type="button" (click)="prevStep()"
+                class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Anterior
+            </button>
+            } @else {
+            <div></div>
+            }
+
+            @if (currentStep() < 3) { <button type="button" [disabled]="!currentFormValid()" (click)="nextStep()"
+                [class]="'py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ' + 
+                       (currentFormValid() ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed')">
+                Siguiente
+                </button>
+                } @else {
+                <button type="button" [disabled]="!currentFormValid() || isSubmitting()" (click)="submitSubscription()"
+                    [class]="'py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ' + 
+                       (currentFormValid() && !isSubmitting() ? 'bg-green-600 hover:bg-green-700' : 'bg-green-300 cursor-not-allowed')">
+                    <span class="flex items-center">
+                        @if (isSubmitting()) {
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Procesando...
+                        } @else {
+                        Completar suscripción
+                        }
+                    </span>
+                </button>
+                }
+        </div>
+        }
+    </div>
+    </div>
+</main>
