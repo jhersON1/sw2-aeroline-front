@@ -31,8 +31,7 @@
     </div>
 
     <!-- Contenedor para los formularios -->
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        @if (submissionSuccess()) {
+    <div class="bg-white shadow rounded-lg overflow-hidden">        @if (submissionSuccess()) {
         <!-- Mensaje de éxito -->
         <div class="p-10 text-center">
             <div class="mb-6 text-green-500">
@@ -43,7 +42,16 @@
             </div>
             <h2 class="text-2xl font-bold text-gray-900 mb-2">¡Registro exitoso!</h2>
             <p class="text-gray-600 mb-4">Su cuenta de aerolínea ha sido creada correctamente.</p>
-            <p class="text-gray-500">Redirigiendo al inicio de sesión...</p>
+            @if (authService.getAirline()) {
+            <div class="bg-green-50 p-4 rounded-md mb-4">
+                <p class="text-sm text-green-800">
+                    <strong>Aerolínea:</strong> {{ authService.getAirline().airline_name }}<br>
+                    <strong>Alias:</strong> {{ authService.getAirline().alias }}<br>
+                    <strong>País:</strong> {{ authService.getAirline().country }}
+                </p>
+            </div>
+            }
+            <p class="text-gray-500">Redirigiendo al inicio...</p>
         </div>
         } @else {
         <!-- Paso 1: Datos de la aerolínea -->
@@ -174,11 +182,21 @@
                 </div>
             </form>
         </div>
-        }
-
-        <!-- Paso 3: Datos de pago -->
+        }        <!-- Paso 3: Datos de pago -->
         @if (currentStep() === 3) {
         <div class="p-6 sm:p-8">
+            <!-- Mensaje de error -->
+            @if (errorMessage()) {
+            <div class="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ errorMessage() }}</span>
+                </div>
+            </div>
+            }
+
             <h2 class="text-xl font-semibold text-gray-900 mb-6">Selección de plan y método de pago</h2>
 
             <!-- Planes de suscripción -->

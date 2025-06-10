@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
+import { AuthService, SubscriptionRequest } from '../../../shared/services/auth.service';
 
 interface AirlineForm {
   airline_name: string;
@@ -34,12 +36,14 @@ interface PaymentForm {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SubscriptionComponent {
-
   private fb = inject(FormBuilder);
+  private router = inject(Router);
+  public authService = inject(AuthService); // Público para usar en template
 
   currentStep = signal<number>(1);
   isSubmitting = signal<boolean>(false);
   submissionSuccess = signal<boolean>(false);
+  errorMessage = signal<string>('');
 
   airlineFormValid = signal<boolean>(false);
   adminFormValid = signal<boolean>(false);
@@ -103,27 +107,49 @@ export class SubscriptionComponent {
       window.scrollTo(0, 0);
     }
   }
-
-  // Simulación de envío de suscripción
+  // Llamada real al backend
   submitSubscription() {
     if (this.airlineForm.valid && this.adminForm.valid && this.paymentForm.valid) {
       this.isSubmitting.set(true);
+      this.errorMessage.set('');
 
-      setTimeout(() => {
-        const subscriptionData = {
-          airline: this.airlineForm.value,
-          admin: this.adminForm.value,
-          payment: this.paymentForm.value
-        };
+      const subscriptionData: SubscriptionRequest = {
+        airline: this.airlineForm.value,
+        admin: this.adminForm.value,
+        payment: this.paymentForm.value
+      };
 
-        console.log('Datos de suscripción:', subscriptionData);
-        this.isSubmitting.set(false);
-        this.submissionSuccess.set(true);
+      console.log('📤 Enviando datos de suscripción:', subscriptionData);
 
-        setTimeout(() => {
-          // this.router.navigate(['/auth/login']);
-        }, 3000);
-      }, 1500);
+      this.authService.registerSubscription(subscriptionData).subscribe({
+        next: (response) => {
+          console.log('✅ Suscripción exitosa:', response);
+          
+          // Guardar sesión
+          this.authService.saveSession(response);
+          
+          this.isSubmitting.set(false);
+          this.submissionSuccess.set(true);
+
+          // Redirigir al home después de 3 segundos
+          setTimeout(() => {
+            this.router.navigate(['/']);
+          }, 3000);
+        },
+        error: (error) => {
+          console.error('❌ Error en suscripción:', error);
+          this.isSubmitting.set(false);
+          
+          // Manejar diferentes tipos de errores
+          if (error.error?.message) {
+            this.errorMessage.set(`Error: ${error.error.message}`);
+          } else if (error.message) {
+            this.errorMessage.set(`Error: ${error.message}`);
+          } else {
+            this.errorMessage.set('Error al procesar la suscripción. Por favor intenta de nuevo.');
+          }
+        }
+      });
     }
   }
 
