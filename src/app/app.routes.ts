@@ -15,5 +15,9 @@ export const routes: Routes = [
     {
         path: 'auth/login',
         component: LoginComponent
+    },
+    {
+        path: '',
+        loadChildren: () => import('./public/public.routes').then(m => m.publicRoutes)
     }
 ];
