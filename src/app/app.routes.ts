@@ -17,6 +17,10 @@ export const routes: Routes = [
         component: LoginComponent
     },
     {
+        path: 'admin',
+        loadChildren: () => import('./admin/admin.routes').then(m => m.adminRoutes)
+    },
+    {
         path: '',
         loadChildren: () => import('./public/public.routes').then(m => m.publicRoutes)
     }

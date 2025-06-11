@@ -400,6 +400,94 @@
                     </div>
                 </div>
             </div>
+        </div>    </section>
+
+    <!-- Portal Access Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Acceso a Portales</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Accede directamente a los diferentes portales de nuestra plataforma
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                <!-- Dashboard Administrativo -->
+                <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl p-6 text-white hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Dashboard Admin</h3>
+                    <p class="text-blue-100 mb-4 text-sm">KPIs en tiempo real y análisis avanzados</p>
+                    <a routerLink="/admin/dashboard" 
+                       class="inline-block bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition duration-200">
+                        Acceder
+                    </a>
+                </div>
+
+                <!-- Portal BOA -->
+                <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-xl p-6 text-white hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">BOA</h3>
+                    <p class="text-green-100 mb-4 text-sm">Boliviana de Aviación - Portal de pasajeros</p>
+                    <a routerLink="/boa" 
+                       class="inline-block bg-white text-green-600 px-4 py-2 rounded-lg font-medium hover:bg-green-50 transition duration-200">
+                        Volar BOA
+                    </a>
+                </div>
+
+                <!-- Portal TAM -->
+                <div class="bg-gradient-to-br from-red-600 to-red-800 rounded-xl p-6 text-white hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">TAM</h3>
+                    <p class="text-red-100 mb-4 text-sm">Transporte Aéreo Militar - Portal de pasajeros</p>
+                    <a routerLink="/tam" 
+                       class="inline-block bg-white text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-red-50 transition duration-200">
+                        Volar TAM
+                    </a>
+                </div>
+
+                <!-- Portal Amaszonas -->
+                <div class="bg-gradient-to-br from-orange-600 to-orange-800 rounded-xl p-6 text-white hover:shadow-xl transition duration-300 transform hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-white bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Amaszonas</h3>
+                    <p class="text-orange-100 mb-4 text-sm">Línea Aérea Amaszonas - Portal de pasajeros</p>
+                    <a routerLink="/amaszonas" 
+                       class="inline-block bg-white text-orange-600 px-4 py-2 rounded-lg font-medium hover:bg-orange-50 transition duration-200">
+                        Volar Amaszonas
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Access Info -->
+            <div class="mt-12 text-center">
+                <div class="bg-blue-50 rounded-lg p-6 max-w-4xl mx-auto">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-2">💡 Información de Acceso</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                        <div>
+                            <strong>Dashboard Admin:</strong> Requiere login previo
+                        </div>
+                        <div>
+                            <strong>Portales Públicos:</strong> Acceso directo para pasajeros
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

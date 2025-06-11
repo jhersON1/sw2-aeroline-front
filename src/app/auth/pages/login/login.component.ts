@@ -35,14 +35,13 @@ export class LoginComponent {
       this.authService.loginAirline(loginData).subscribe({
         next: (response) => {
           console.log('✅ Login exitoso:', response);
-          
-          // Guardar sesión
+            // Guardar sesión
           this.authService.saveSession(response);
           
           this.isLoading.set(false);
           
-          // Redirigir al home
-          this.router.navigate(['/']);
+          // Redirigir al dashboard administrativo
+          this.router.navigate(['/admin/dashboard']);
         },
         error: (error) => {
           console.error('❌ Error en login:', error);
