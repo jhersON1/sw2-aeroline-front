@@ -11,16 +11,16 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
   imports: [CommonModule, ReactiveFormsModule],
   template: `
     <div class="space-y-6">
-      
+
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Dashboard de KPIs</h1>
           <p class="text-gray-600 mt-1">Monitoreo en tiempo real de indicadores clave de rendimiento</p>
         </div>
-        
+
         <div class="mt-4 sm:mt-0 flex items-center space-x-3">
-          <button (click)="refreshData()" 
+          <button (click)="refreshData()"
                   [disabled]="isLoading"
                   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
             <svg xmlns="http://www.w3.org/2000/svg" [class]="'h-4 w-4 mr-2 ' + (isLoading ? 'animate-spin' : '')" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -28,8 +28,8 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
             </svg>
             {{ isLoading ? 'Actualizando...' : 'Actualizar' }}
           </button>
-          
-          <button (click)="exportData()" 
+
+          <button (click)="exportData()"
                   [disabled]="!currentKPIs"
                   class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,15 +44,15 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
       <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-lg font-medium text-gray-900 mb-4">Filtros</h2>
         <form [formGroup]="filterForm" class="space-y-4">
-          
+
           <!-- Quick Date Filters -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Rangos predefinidos</label>
             <div class="flex flex-wrap gap-2">
               @for (range of dateRanges; track range.label) {
-                <button type="button" 
+                <button type="button"
                         (click)="selectDateRange(range)"
-                        [class]="'px-3 py-2 text-xs font-medium rounded-md border transition duration-200 ' + 
+                        [class]="'px-3 py-2 text-xs font-medium rounded-md border transition duration-200 ' +
                                  (isSelectedRange(range) ? 'bg-blue-100 border-blue-300 text-blue-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50')">
                   {{ range.label }}
                 </button>
@@ -62,21 +62,21 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Fecha inicio</label>
-              <input type="date" 
+              <input type="date"
                      formControlName="start_date"
                      [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ' +
-                             (filterForm.get('start_date')?.value ? 
-                               'border-blue-300 text-gray-900 bg-blue-50 font-medium' : 
+                             (filterForm.get('start_date')?.value ?
+                               'border-blue-300 text-gray-900 bg-blue-50 font-medium' :
                                'border-gray-300 text-gray-500 bg-white')">
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Fecha fin</label>
-              <input type="date" 
+              <input type="date"
                      formControlName="end_date"
                      [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ' +
-                             (filterForm.get('end_date')?.value ? 
-                               'border-blue-300 text-gray-900 bg-blue-50 font-medium' : 
+                             (filterForm.get('end_date')?.value ?
+                               'border-blue-300 text-gray-900 bg-blue-50 font-medium' :
                                'border-gray-300 text-gray-500 bg-white')">
             </div>
           </div>
@@ -85,36 +85,36 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Número de cola (opcional)</label>
-              <input type="text" 
+              <input type="text"
                      formControlName="tail_num"
                      placeholder="Ej: N146PQ"
                      [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ' +
-                             (filterForm.get('tail_num')?.value ? 
-                               'border-green-300 text-gray-900 bg-green-50 font-medium placeholder-green-400' : 
+                             (filterForm.get('tail_num')?.value ?
+                               'border-green-300 text-gray-900 bg-green-50 font-medium placeholder-green-400' :
                                'border-gray-300 text-gray-700 bg-white placeholder-gray-400')">
               <p class="text-xs text-gray-500 mt-1">Funcionalidad en desarrollo</p>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Origen (opcional)</label>
-              <input type="text" 
+              <input type="text"
                      formControlName="origin"
                      placeholder="Ej: 8NY"
                      [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ' +
-                             (filterForm.get('origin')?.value ? 
-                               'border-green-300 text-gray-900 bg-green-50 font-medium placeholder-green-400' : 
+                             (filterForm.get('origin')?.value ?
+                               'border-green-300 text-gray-900 bg-green-50 font-medium placeholder-green-400' :
                                'border-gray-300 text-gray-700 bg-white placeholder-gray-400')">
               <p class="text-xs text-gray-500 mt-1">Funcionalidad en desarrollo</p>
             </div>
-            
+
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Destino (opcional)</label>
-              <input type="text" 
+              <input type="text"
                      formControlName="dest"
                      placeholder="Ej: 5AK"
                      [class]="'w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ' +
-                             (filterForm.get('dest')?.value ? 
-                               'border-green-300 text-gray-900 bg-green-50 font-medium placeholder-green-400' : 
+                             (filterForm.get('dest')?.value ?
+                               'border-green-300 text-gray-900 bg-green-50 font-medium placeholder-green-400' :
                                'border-gray-300 text-gray-700 bg-white placeholder-gray-400')">
               <p class="text-xs text-gray-500 mt-1">Funcionalidad en desarrollo</p>
             </div>
@@ -149,7 +149,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
       }      <!-- KPI Cards -->
       @if (currentKPIs && !isLoading) {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
+
           <!-- Cancellation Rate -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
@@ -181,7 +181,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                 <span>Del período seleccionado</span>
               </div>
             </div>
-            
+
             <!-- Mini Chart Placeholder -->
             <div class="mt-4 h-16 bg-gradient-to-r from-red-50 to-red-100 rounded flex items-end justify-center">
               <div class="text-xs text-red-600 mb-2">Gráfico histórico</div>
@@ -217,7 +217,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
               <div class="text-3xl font-bold text-gray-900">{{ currentKPIs.avg_dep_delay_cancelled | number:'1.1-1' }}</div>
               <div class="text-sm text-gray-600">minutos</div>
             </div>
-            
+
             <!-- Mini Chart Placeholder -->
             <div class="mt-4 h-16 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded flex items-end justify-center">
               <div class="text-xs text-yellow-600 mb-2">Gráfico histórico</div>
@@ -255,7 +255,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                 <span>De las cancelaciones totales</span>
               </div>
             </div>
-            
+
             <!-- Mini Chart Placeholder -->
             <div class="mt-4 h-16 bg-gradient-to-r from-blue-50 to-blue-100 rounded flex items-end justify-center">
               <div class="text-xs text-blue-600 mb-2">Gráfico histórico</div>
@@ -265,7 +265,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
 
         <!-- Additional KPIs Section -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          
+
           <!-- Non-Weather Cancellation Rate -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between">
@@ -287,7 +287,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                 <span>De las cancelaciones totales</span>
               </div>
             </div>
-            
+
             <!-- Mini Chart Placeholder -->
             <div class="mt-4 h-16 bg-gradient-to-r from-purple-50 to-purple-100 rounded flex items-end justify-center">
               <div class="text-xs text-purple-600 mb-2">Gráfico histórico</div>
@@ -315,7 +315,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                 <span [class]="getEfficiencyScoreClass()">{{ getEfficiencyLabel() }}</span>
               </div>
             </div>
-            
+
             <!-- Mini Chart Placeholder -->
             <div class="mt-4 h-16 bg-gradient-to-r from-green-50 to-green-100 rounded flex items-end justify-center">
               <div class="text-xs text-green-600 mb-2">Gráfico histórico</div>
@@ -343,7 +343,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                 <span [class]="getWeatherImpactClass()">{{ getWeatherImpactLabel() }}</span>
               </div>
             </div>
-            
+
             <!-- Mini Chart Placeholder -->
             <div class="mt-4 h-16 bg-gradient-to-r from-orange-50 to-orange-100 rounded flex items-end justify-center">
               <div class="text-xs text-orange-600 mb-2">Gráfico histórico</div>
@@ -353,13 +353,13 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
         <!-- Visual Chart Section -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
           <h3 class="text-lg font-medium text-gray-900 mb-6">Análisis Visual de KPIs</h3>
-          
+
           <!-- Comparative Bar Chart -->
           <div class="space-y-6">
             <div>
               <h4 class="text-md font-medium text-gray-800 mb-4">Comparativa de Indicadores Principales</h4>
               <div class="space-y-4">
-                
+
                 <!-- Cancellation Rate Bar -->
                 <div class="flex items-center space-x-4">
                   <div class="w-32 text-sm font-medium text-gray-700">Cancelación</div>
@@ -422,24 +422,24 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                   <span class="text-sm font-medium text-gray-600">Demora Promedio de Vuelos Cancelados</span>
                   <span class="text-lg font-bold text-yellow-600">{{ currentKPIs.avg_dep_delay_cancelled | number:'1.1-1' }} min</span>
                 </div>
-                
+
                 <!-- Delay visualization bars -->
                 <div class="space-y-2">
                   <!-- Delay ranges visualization -->
                   <div class="flex items-center space-x-2 text-xs">
                     <div class="w-16 text-gray-600">0-30 min</div>
-                    <div class="flex-1 bg-green-200 h-2 rounded" 
+                    <div class="flex-1 bg-green-200 h-2 rounded"
                          [style.width.%]="getDelayRangePercentage('low')"></div>
                     <span class="w-12 text-gray-600">{{ getDelayRangePercentage('low') | number:'1.0-0' }}%</span>
                   </div>
-                  
+
                   <div class="flex items-center space-x-2 text-xs">
                     <div class="w-16 text-gray-600">30-60 min</div>
                     <div class="flex-1 bg-yellow-300 h-2 rounded"
                          [style.width.%]="getDelayRangePercentage('medium')"></div>
                     <span class="w-12 text-gray-600">{{ getDelayRangePercentage('medium') | number:'1.0-0' }}%</span>
                   </div>
-                  
+
                   <div class="flex items-center space-x-2 text-xs">
                     <div class="w-16 text-gray-600">60+ min</div>
                     <div class="flex-1 bg-red-400 h-2 rounded"
@@ -447,7 +447,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                     <span class="w-12 text-gray-600">{{ getDelayRangePercentage('high') | number:'1.0-0' }}%</span>
                   </div>
                 </div>
-                
+
                 <div class="mt-3 text-xs text-gray-500">
                   * Distribución estimada basada en demora promedio de {{ currentKPIs.avg_dep_delay_cancelled | number:'1.1-1' }} minutos
                 </div>
@@ -468,7 +468,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
                          [style.width.%]="getEfficiencyScore()"></div>
                   </div>
                 </div>
-                
+
                 <div class="bg-gray-50 rounded-lg p-4 text-center">
                   <div class="text-2xl font-bold" [class]="getWeatherImpactClass()">
                     {{ getWeatherImpactIndex() }}
@@ -523,7 +523,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Insights y Recomendaciones</h3>
             <div class="space-y-3">
-              
+
               @if (currentKPIs.cancellation_rate > 5) {
                 <div class="flex items-start space-x-3 p-3 bg-red-50 rounded-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -622,7 +622,7 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
               {{ isConnected ? 'Conectado a la API' : 'Sin conexión con la API' }}
             </span>
           </div>
-          
+
           <!-- Retry Button -->
           @if (!isConnected) {
             <button (click)="checkAPIConnection()" class="text-sm text-blue-600 hover:text-blue-500">
@@ -646,13 +646,13 @@ import { KPIService, KPIRequest, KPIResponse, DateRange } from '../../services/k
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  
+
   filterForm: FormGroup;
   dateRanges: DateRange[] = [];
-  
+
   currentKPIs: KPIResponse | null = null;
   previousKPIs: KPIResponse | null = null;
-  
+
   isLoading: boolean = false;
   errorMessage: string | null = null;
   lastUpdated: Date | null = null;
@@ -673,7 +673,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }  ngOnInit() {
     console.log('🎬 [Dashboard] Inicializando componente...');
     this.dateRanges = this.kpiService.getDateRanges();
-    
+
     // Seleccionar "Todo Junio 2022" por defecto
     const defaultRange = this.dateRanges.find(range => range.label === 'Todo Junio 2022');
     if (defaultRange) {
@@ -683,12 +683,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
         end_date: defaultRange.end
       });
     }
-    
+
     this.setupFormSubscription();
     this.setupLoadingSubscription();
     this.setupErrorSubscription();
     this.checkAPIConnection();
-    
+
     // Carga inicial con el rango por defecto
     console.log('📊 [Dashboard] Carga inicial con rango por defecto...');
     this.loadKPIs();
@@ -741,7 +741,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log('📊 [Dashboard] Iniciando carga de KPIs...');
     const filters: KPIRequest = this.filterForm.value;
     console.log('📊 [Dashboard] Filtros del formulario:', filters);
-    
+
     this.kpiService.getKPIs(filters)
       .pipe(takeUntil(this.destroy$))
       .subscribe({        next: (kpis) => {
@@ -751,11 +751,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.lastUpdated = new Date();
           console.log('✅ [Dashboard] Después - currentKPIs:', this.currentKPIs);
           console.log('✅ [Dashboard] lastUpdated:', this.lastUpdated);
-          
+
           // Forzar detección de cambios
           this.cdr.detectChanges();
           console.log('🔄 [Dashboard] Change detection triggered');
-          
+
           console.log('📊 [Dashboard] Iniciando carga de datos de comparación...');
           this.loadComparisonData(filters);
         },
@@ -799,7 +799,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const csvContent = data.map(row => row.join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    
+
     if (link.download !== undefined) {
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
@@ -814,14 +814,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   getSelectedDateRangeLabel(): string {
     const startDate = this.filterForm.get('startDate')?.value;
     const endDate = this.filterForm.get('endDate')?.value;
-    
+
     if (startDate && endDate) {
-      const selectedRange = this.dateRanges.find(range => 
+      const selectedRange = this.dateRanges.find(range =>
         range.start === startDate && range.end === endDate
       );
       return selectedRange?.label || `${startDate} a ${endDate}`;
     }
-    
+
     return 'Rango personalizado';
   }
 
@@ -836,16 +836,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   getTrendClass(current: number, previous: number, reverseGood: boolean = false): string {
     const change = this.getPercentageChange(current, previous);
     const isGood = reverseGood ? change < 0 : change > 0;
-    
+
     if (Math.abs(change) < 1) return 'text-gray-500';
     return isGood ? 'text-green-600' : 'text-red-600';
   }
 
   getTrendIcon(current: number, previous: number, reverseGood: boolean = false): string {
     const change = this.getPercentageChange(current, previous);
-    
+
     if (Math.abs(change) < 1) return 'M5 12h14';
-    
+
     const isUp = change > 0;
     return isUp ? 'M7 14l3-3 3 3' : 'M7 10l3 3 3-3';
   }  /**
@@ -883,16 +883,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
    */
   getEfficiencyScore(): number {
     if (!this.currentKPIs) return 0;
-    
+
     // Base score starts at 100
     let score = 100;
-    
+
     // Reduce score based on cancellation rate (each 1% cancellation = -10 points)
     score -= (this.currentKPIs.cancellation_rate * 10);
-    
+
     // Reduce score based on average delay (each 10 minutes = -5 points)
     score -= (this.currentKPIs.avg_dep_delay_cancelled / 10) * 5;
-    
+
     // Ensure score doesn't go below 0
     return Math.max(0, Math.round(score));
   }
@@ -924,10 +924,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
    */
   getWeatherImpactIndex(): number {
     if (!this.currentKPIs) return 0;
-    
+
     // Combine cancellation rate and weather percentage
     const weatherImpact = (this.currentKPIs.cancellation_rate * this.currentKPIs.weather_cancellation_rate) / 100;
-    
+
     // Scale to 0-100 (higher is worse)
     return Math.min(100, Math.round(weatherImpact * 20));
   }
@@ -980,9 +980,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
    */
   getDelayRangePercentage(range: 'low' | 'medium' | 'high'): number {
     if (!this.currentKPIs) return 0;
-    
+
     const avgDelay = this.currentKPIs.avg_dep_delay_cancelled;
-    
+
     // Estimate distribution based on average delay
     if (avgDelay <= 30) {
       // Low average delay scenario
