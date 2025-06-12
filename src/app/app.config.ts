@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
 
       return {
         link: httpLink.create({
-          uri: 'http://localhost:8081/graphql', // URL del microservicio dockerizado local
+          uri: 'http://13.218.34.214:8081/graphql', // URL del microservicio dockerizado local
         }),
         cache: new InMemoryCache({
           addTypename: false // Desactivar __typename para evitar conflictos
