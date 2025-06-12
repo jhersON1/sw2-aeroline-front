@@ -170,7 +170,7 @@ import { FlightService, BookingData, PaymentInfo } from '../../services/flight.s
                       </svg>
                     </div>
                     <div>
-                      <p class="font-medium">{{ bookingData.flight.flightNumber }}</p>
+                      <p class="font-medium">{{ bookingData.flight.code }}</p>
                       <p class="text-sm text-gray-600">{{ bookingData.flight.aircraft }}</p>
                     </div>
                   </div>

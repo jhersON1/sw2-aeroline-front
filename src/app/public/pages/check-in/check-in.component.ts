@@ -95,7 +95,7 @@ import { FlightService, BookingData } from '../../services/flight.service';
                         </svg>
                       </div>
                       <div>
-                        <p class="font-bold text-lg">{{ bookingData.flight.flightNumber }}</p>
+                        <p class="font-bold text-lg">{{ bookingData.flight.code }}</p>
                         <p class="text-gray-600">{{ bookingData.flight.origin.city }} → {{ bookingData.flight.destination.city }}</p>
                         <p class="text-sm text-gray-500">{{ getCurrentDate() | date:'mediumDate' }} • {{ bookingData.flight.departureTime }}</p>
                       </div>
@@ -168,7 +168,7 @@ import { FlightService, BookingData } from '../../services/flight.service';
                     
                     <div>
                       <p class="text-gray-500">Vuelo</p>
-                      <p class="font-medium">{{ bookingData.flight.flightNumber }}</p>
+                      <p class="font-medium">{{ bookingData.flight.code }}</p>
                     </div>
                     
                     <div>

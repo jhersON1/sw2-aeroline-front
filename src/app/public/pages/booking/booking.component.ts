@@ -17,7 +17,7 @@ import { FlightService, BookingData, Passenger } from '../../services/flight.ser
             <div class="flex items-center justify-between">
               <div>
                 <h1 class="text-2xl font-bold text-gray-900">Información de Pasajeros</h1>
-                <p class="text-gray-600">Vuelo {{ bookingData.flight.flightNumber }}</p>
+                <p class="text-gray-600">Vuelo {{ bookingData.flight.code }}</p>
               </div>
               <button (click)="goBack()" class="px-4 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50">
                 Volver a vuelos
@@ -182,7 +182,7 @@ import { FlightService, BookingData, Passenger } from '../../services/flight.ser
                       </svg>
                     </div>
                     <div>
-                      <p class="font-medium">{{ bookingData.flight.flightNumber }}</p>
+                      <p class="font-medium">{{ bookingData.flight.code }}</p>
                       <p class="text-sm text-gray-600">{{ bookingData.flight.aircraft }}</p>
                     </div>
                   </div>

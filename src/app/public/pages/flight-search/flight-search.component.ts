@@ -42,23 +42,49 @@ import { FlightService, Airport } from '../../services/flight.service';
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">                  <!-- Origin -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Origen</label>
-                    <select formControlName="origin" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white">
-                      <option value="" class="text-gray-500">Seleccionar ciudad</option>
+                    <select formControlName="origin" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white cursor-pointer">
+                      <option value="" disabled class="text-gray-500">
+                        @if (airportsLoading) {
+                          Cargando aeropuertos...
+                        } @else if (airports.length === 0) {
+                          No hay aeropuertos disponibles
+                        } @else {
+                          Seleccionar ciudad de origen
+                        }
+                      </option>
                       @for (airport of airports; track airport.code) {
-                        <option [value]="airport.code" class="text-gray-900">{{ airport.city }} ({{ airport.code }})</option>
+                        <option [value]="airport.code" class="text-gray-900 py-2">
+                          {{ airport.city }} - {{ airport.name }} ({{ airport.code }})
+                        </option>
                       }
                     </select>
+                    @if (airports.length === 0 && !airportsLoading) {
+                      <p class="text-xs text-red-500 mt-1">⚠️ No se pudieron cargar los aeropuertos</p>
+                    }
                   </div>
 
                   <!-- Destination -->
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Destino</label>
-                    <select formControlName="destination" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white">
-                      <option value="" class="text-gray-500">Seleccionar ciudad</option>
+                    <select formControlName="destination" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white cursor-pointer">
+                      <option value="" disabled class="text-gray-500">
+                        @if (airportsLoading) {
+                          Cargando aeropuertos...
+                        } @else if (airports.length === 0) {
+                          No hay aeropuertos disponibles
+                        } @else {
+                          Seleccionar ciudad de destino
+                        }
+                      </option>
                       @for (airport of airports; track airport.code) {
-                        <option [value]="airport.code" class="text-gray-900">{{ airport.city }} ({{ airport.code }})</option>
+                        <option [value]="airport.code" class="text-gray-900 py-2">
+                          {{ airport.city }} - {{ airport.name }} ({{ airport.code }})
+                        </option>
                       }
                     </select>
+                    @if (airports.length === 0 && !airportsLoading) {
+                      <p class="text-xs text-red-500 mt-1">⚠️ No se pudieron cargar los aeropuertos</p>
+                    }
                   </div>
 
                   <!-- Departure Date -->
@@ -153,6 +179,7 @@ import { FlightService, Airport } from '../../services/flight.service';
 export class FlightSearchComponent implements OnInit {
   searchForm: FormGroup;
   airports: Airport[] = [];
+  airportsLoading: boolean = true;
   passengers: number = 1;
   airlineAlias: string = '';
   airlineName: string = '';
@@ -170,15 +197,32 @@ export class FlightSearchComponent implements OnInit {
       departureDate: ['', Validators.required],
       returnDate: ['']
     });
-  }
-
-  ngOnInit() {
-    this.airports = this.flightService.getAirports();
+  }  ngOnInit() {
+    console.log('🚀 FlightSearchComponent iniciando...');
+    
+    // Cargar aeropuertos desde GraphQL
+    this.airportsLoading = true;
+    console.log('🔄 Cargando aeropuertos...');
+    this.flightService.getAirports().subscribe({
+      next: (airports) => {
+        console.log('✅ Aeropuertos recibidos:', airports);
+        this.airports = airports;
+        this.airportsLoading = false;
+      },
+      error: (error) => {
+        console.error('❌ Error cargando aeropuertos:', error);
+        // Fallback a lista vacía o mostrar mensaje de error
+        this.airports = [];
+        this.airportsLoading = false;
+      }
+    });
     
     // Get airline alias from route
     this.route.parent?.params.subscribe(params => {
+      console.log('📍 Parámetros de ruta recibidos:', params);
       this.airlineAlias = params['airlineAlias'];
       this.airlineName = this.formatAirlineName(this.airlineAlias);
+      console.log(`🏢 Aerolínea: ${this.airlineName} (${this.airlineAlias})`);
     });
 
     // Set minimum date to today
@@ -210,10 +254,22 @@ export class FlightSearchComponent implements OnInit {
       this.passengers--;
     }
   }
-
   searchFlights() {
+    console.log('🔍 Iniciando búsqueda de vuelos...');
+    console.log('📝 Formulario válido:', this.searchForm.valid);
+    console.log('📝 Valores del formulario:', this.searchForm.value);
+    
     if (this.searchForm.valid) {
       const formValue = this.searchForm.value;
+      
+      console.log('✅ Navegando a resultados con parámetros:', {
+        origin: formValue.origin,
+        destination: formValue.destination,
+        departureDate: formValue.departureDate,
+        returnDate: formValue.returnDate,
+        passengers: this.passengers,
+        tripType: formValue.tripType
+      });
       
       // Navigate to results page with search parameters
       this.router.navigate(['/', this.airlineAlias, 'flights'], {
@@ -226,6 +282,14 @@ export class FlightSearchComponent implements OnInit {
           tripType: formValue.tripType
         }
       });
+    } else {
+      console.log('❌ Formulario inválido, errores:', Object.keys(this.searchForm.controls).reduce((acc, key) => {
+        const control = this.searchForm.get(key);
+        if (control && control.errors) {
+          acc[key] = control.errors;
+        }
+        return acc;
+      }, {} as any));
     }
   }
 

@@ -69,7 +69,7 @@ export interface LoginRequest {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:3000/api/auth';
+  private readonly apiUrl = 'http://34.107.191.119/api/auth';
 
   constructor(private http: HttpClient) {}
 

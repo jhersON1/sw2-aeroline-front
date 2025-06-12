@@ -13,6 +13,11 @@ import { AircraftDashboardComponent } from '../features/aircraft/pages/aircraft-
 import { AircraftCreateComponent } from '../features/aircraft/pages/aircraft-create/aircraft-create.component';
 import { AircraftEditComponent } from '../features/aircraft/pages/aircraft-edit/aircraft-edit.component';
 
+// Importar componentes de vuelos
+import { FlightDashboardComponent } from '../features/flight/pages/flight-dashboard/flight-dashboard.component';
+import { FlightCreateComponent } from '../features/flight/pages/flight-create/flight-create.component';
+import { FlightEditComponent } from '../features/flight/pages/flight-edit/flight-edit.component';
+
 export const adminRoutes: Routes = [
   {
     path: '',
@@ -43,11 +48,22 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'aircraft/create',
-        component: AircraftCreateComponent,
-      },
+        component: AircraftCreateComponent,      },
       {
         path: 'aircraft/edit/:id',
         component: AircraftEditComponent,
+      },      // ✅ NUEVAS RUTAS DE VUELOS
+      {
+        path: 'flights',
+        component: FlightDashboardComponent,
+      },
+      {
+        path: 'flights/create',
+        component: FlightCreateComponent,
+      },
+      {
+        path: 'flights/edit/:id',
+        component: FlightEditComponent,
       },
       {
         path: '',

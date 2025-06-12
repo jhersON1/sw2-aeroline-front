@@ -65,7 +65,7 @@ import { FlightService, BookingData } from '../../services/flight.service';
                           </div>
                         </div>
                         <p class="text-sm text-gray-600 mt-2">{{ bookingData.flight.duration }}</p>
-                        <p class="text-xs text-gray-500">{{ bookingData.flight.flightNumber }}</p>
+                        <p class="text-xs text-gray-500">{{ bookingData.flight.code }}</p>
                       </div>
                       
                       <div class="text-center">
@@ -79,7 +79,7 @@ import { FlightService, BookingData } from '../../services/flight.service';
                     <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <p class="text-gray-500">Vuelo</p>
-                        <p class="font-medium">{{ bookingData.flight.flightNumber }}</p>
+                        <p class="font-medium">{{ bookingData.flight.code }}</p>
                       </div>
                       <div>
                         <p class="text-gray-500">Aeronave</p>
