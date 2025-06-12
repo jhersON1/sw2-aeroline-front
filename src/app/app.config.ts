@@ -21,7 +21,7 @@ export const appConfig: ApplicationConfig = {
 
       return {
         link: httpLink.create({
-          uri: 'http://localhost:8081/graphql', // ← CAMBIAR ESTO
+          uri: 'http://localhost:8081/graphql', // ← URL del microservicio de vuelos
         }),
         cache: new InMemoryCache(),
       };

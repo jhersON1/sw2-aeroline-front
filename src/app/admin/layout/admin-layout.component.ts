@@ -61,11 +61,11 @@ import { RouterOutlet, RouterLink } from '@angular/router';
                 class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
                 routerLinkActive="text-blue-600 bg-blue-50"
               >
-                Aviones
-              </a>
+                Aviones              </a>
               <a
-                href="#"
+                routerLink="/admin/flights"
                 class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                routerLinkActive="text-blue-600 bg-blue-50"
               >
                 Vuelos
               </a>

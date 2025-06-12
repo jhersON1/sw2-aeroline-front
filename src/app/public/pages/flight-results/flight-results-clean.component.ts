@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FlightService, Flight, Airport } from '../../services/flight.service';
@@ -26,17 +26,14 @@ import { FlightService, Flight, Airport } from '../../services/flight.service';
         </div>
       </div>
 
-      <div class="container mx-auto px-4 py-8">        @if (loading) {
+      <div class="container mx-auto px-4 py-8">
+        @if (loading) {
           <!-- Loading State -->
           <div class="text-center py-12">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p class="mt-4 text-gray-600">Buscando vuelos desde {{ origin }} a {{ destination }}...</p>
-            <!-- Debug info mejorado -->
-            <div class="text-xs text-gray-400 mt-2 p-2 bg-gray-100 rounded">
-              <p>Debug: loading={{loading}}, flights.length={{flights.length}}</p>
-              <p>Búsqueda: {{origin}} → {{destination}} para {{passengers}} pasajeros</p>
-              <p>Fecha: {{departureDate}}</p>
-            </div>
+            <p class="mt-4 text-gray-600">Buscando los mejores vuelos...</p>
+            <!-- Debug info -->
+            <p class="text-xs text-gray-400 mt-2">Debug: loading={{loading}}, flights.length={{flights.length}}</p>
           </div>
         } @else if (flights.length === 0) {
           <!-- No Results -->
@@ -103,7 +100,8 @@ import { FlightService, Flight, Airport } from '../../services/flight.service';
 
                     <!-- Price and Availability -->
                     <div class="text-center lg:text-right">
-                      <p class="text-3xl font-bold text-green-600">{{ flight.price | currency:'BOB':'symbol':'1.0-0' }}</p>                      <p class="text-sm text-gray-600">por persona</p>
+                      <p class="text-3xl font-bold text-green-600">{{ flight.price | currency:'BOB':'symbol':'1.0-0' }}</p>
+                      <p class="text-sm text-gray-600">por persona</p>
                       <p class="text-xs text-gray-500 mt-1">{{ flight.aircraft.seatsTotal }} asientos</p>
                     </div>
 
@@ -178,57 +176,26 @@ export class FlightResultsComponent implements OnInit {
   originCity: string = '';
   destinationCity: string = '';
   airlineAlias: string = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private flightService: FlightService,
-    private cdr: ChangeDetectorRef
-  ) {}  ngOnInit() {
-    console.log('🚀 FlightResultsComponent iniciando...');
-    
+    private flightService: FlightService
+  ) {}
+
+  ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      console.log('📍 Query params recibidos:', params);
-      
       this.origin = params['origin'];
       this.destination = params['destination'];
       this.departureDate = params['departureDate'];
       this.passengers = parseInt(params['passengers']) || 1;
       this.tripType = params['tripType'];
       
-      console.log('📊 Parámetros parseados:', {
-        origin: this.origin,
-        destination: this.destination,
-        departureDate: this.departureDate,
-        passengers: this.passengers
-      });
-      
-      // Si no tenemos parámetros, intentar usar los últimos guardados
-      if (!this.origin || !this.destination || !this.departureDate) {
-        const lastParams = this.flightService.getLastSearchParams();
-        if (lastParams) {
-          console.log('🔄 Usando parámetros guardados:', lastParams);
-          this.origin = lastParams.origin;
-          this.destination = lastParams.destination;
-          this.departureDate = lastParams.departureDate;
-          this.passengers = lastParams.passengers;
-          this.tripType = lastParams.tripType;
-        }
-      }
-      
-      // Solo cargar vuelos si tenemos los parámetros mínimos
-      if (this.origin && this.destination && this.departureDate) {
-        this.loadFlights();
-      } else {
-        console.error('❌ Faltan parámetros de búsqueda:', { origin: this.origin, destination: this.destination, date: this.departureDate });
-        this.loading = false;
-        this.flights = [];
-        this.cdr.detectChanges();
-      }
+      this.loadFlights();
     });
 
     this.route.parent?.params.subscribe(params => {
       this.airlineAlias = params['airlineAlias'];
-      console.log('🏢 Airline alias:', this.airlineAlias);
     });
 
     this.setCityNames();
@@ -239,39 +206,25 @@ export class FlightResultsComponent implements OnInit {
       this.originCity = airports.find(a => a.code === this.origin)?.city || this.origin;
       this.destinationCity = airports.find(a => a.code === this.destination)?.city || this.destination;
     });
-  }  private loadFlights() {
+  }
+
+  private loadFlights() {
     console.log(`🔍 INICIO loadFlights: ${this.origin} → ${this.destination} el ${this.departureDate}`);
-    
-    // Validación de parámetros
-    if (!this.origin || !this.destination || !this.departureDate) {
-      console.error('❌ Parámetros inválidos para loadFlights:', {
-        origin: this.origin,
-        destination: this.destination,
-        departureDate: this.departureDate
-      });
-      this.loading = false;
-      this.flights = [];
-      this.cdr.detectChanges();
-      return;
-    }
-    
     console.log(`📊 Estado inicial - loading: ${this.loading}, flights.length: ${this.flights.length}`);
     
     this.loading = true;
-    this.flights = []; // Limpiar vuelos anteriores
-    this.cdr.detectChanges(); // Actualizar UI inmediatamente
     
-    // Usar searchFlights de GraphQL
-    this.flightService.searchFlights(
+    // Usar la búsqueda HTTP directa (más robusta que Apollo)
+    this.flightService.searchFlightsHttp(
       this.origin,
       this.destination,
       this.departureDate,
-      this.passengers).subscribe({
+      this.passengers
+    ).subscribe({
       next: (flights) => {
         console.log(`✅ RECIBIDOS ${flights?.length || 0} vuelos:`, flights);
         this.flights = flights || [];
         this.loading = false;
-        this.cdr.detectChanges(); // Forzar detección de cambios
         console.log(`📊 Estado final - loading: ${this.loading}, flights.length: ${this.flights.length}`);
       },
       error: (error) => {
@@ -279,78 +232,39 @@ export class FlightResultsComponent implements OnInit {
         // Mostrar datos mock como fallback
         this.flights = this.getMockFlights();
         this.loading = false;
-        this.cdr.detectChanges(); // Forzar detección de cambios
         console.log(`📊 Estado error - loading: ${this.loading}, flights.length: ${this.flights.length}`);
       }
-    });    // Timeout de seguridad para evitar carga infinita
+    });
+    
+    // Timeout de seguridad para evitar carga infinita
     setTimeout(() => {
       if (this.loading) {
-        console.log('⏰ TIMEOUT: Carga tomó más de 2 segundos, usando fallback');
+        console.log('⏰ TIMEOUT: Carga tomó más de 10 segundos');
         this.flights = this.getMockFlights();
         this.loading = false;
-        this.cdr.detectChanges(); // Forzar detección de cambios
       }
-    }, 2000); // Reducido a 2 segundos
+    }, 10000);
   }
-  private getMockFlights(): Flight[] {
-    // Datos mock realistas basados en los parámetros de búsqueda
-    const today = new Date();
-    const departureDateTime = this.departureDate ? `${this.departureDate}T08:00:00` : today.toISOString();
-    const arrivalDateTime = this.departureDate ? `${this.departureDate}T09:30:00` : new Date(today.getTime() + 90*60000).toISOString();
 
+  private getMockFlights(): Flight[] {
+    // Datos mock para evitar pantalla de carga infinita
     return [
       {
-        id: 'mock-boa-001',
-        code: 'OB-101',
-        origin: { 
-          code: this.origin || 'LPB', 
-          name: `Aeropuerto ${this.origin || 'El Alto'}`, 
-          city: this.originCity || 'La Paz' 
-        },
-        destination: { 
-          code: this.destination || 'VVI', 
-          name: `Aeropuerto ${this.destination || 'Viru Viru'}`, 
-          city: this.destinationCity || 'Santa Cruz' 
-        },
-        departureTime: departureDateTime,
-        arrivalTime: arrivalDateTime,
+        id: 'mock-1',
+        code: 'BOA-001',
+        origin: { code: this.origin, name: 'Aeropuerto Origen', city: 'Origen' },
+        destination: { code: this.destination, name: 'Aeropuerto Destino', city: 'Destino' },
+        departureTime: '2025-06-15T08:00:00',
+        arrivalTime: '2025-06-15T09:30:00',
         duration: 90,
         price: 450,
-        aircraft: { model: 'Boeing 737-800', seatsTotal: 160 },
-        status: 'PROGRAMADO'
-      },
-      {
-        id: 'mock-boa-002',
-        code: 'OB-102',
-        origin: { 
-          code: this.origin || 'LPB', 
-          name: `Aeropuerto ${this.origin || 'El Alto'}`, 
-          city: this.originCity || 'La Paz' 
-        },
-        destination: { 
-          code: this.destination || 'VVI', 
-          name: `Aeropuerto ${this.destination || 'Viru Viru'}`, 
-          city: this.destinationCity || 'Santa Cruz' 
-        },
-        departureTime: this.departureDate ? `${this.departureDate}T14:30:00` : new Date(today.getTime() + 6.5*60*60*1000).toISOString(),
-        arrivalTime: this.departureDate ? `${this.departureDate}T16:00:00` : new Date(today.getTime() + 8*60*60*1000).toISOString(),
-        duration: 90,
-        price: 480,
         aircraft: { model: 'Boeing 737-800', seatsTotal: 160 },
         status: 'PROGRAMADO'
       }
     ];
   }
+
   selectFlight(flight: Flight) {
-    // Guardar parámetros de búsqueda antes de navegar
-    this.flightService.setLastSearchParams({
-      origin: this.origin,
-      destination: this.destination,
-      departureDate: this.departureDate,
-      passengers: this.passengers,
-      tripType: this.tripType
-    });
-    
     // Create booking data
     const bookingData = {
       flight: flight,
@@ -364,17 +278,9 @@ export class FlightResultsComponent implements OnInit {
     // Navigate to booking page
     this.router.navigate(['/', this.airlineAlias, 'booking']);
   }
+
   goBack() {
-    // Navegar de vuelta con los query params actuales para preservar la búsqueda
-    this.router.navigate(['/', this.airlineAlias], {
-      queryParams: {
-        origin: this.origin,
-        destination: this.destination,
-        departureDate: this.departureDate,
-        passengers: this.passengers,
-        tripType: this.tripType
-      }
-    });
+    this.router.navigate(['/', this.airlineAlias]);
   }
 
   formatTime(dateTimeString: string): string {

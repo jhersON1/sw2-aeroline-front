@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AirlineService } from '../../shared/services/airline.service';
 
 @Component({  selector: 'app-public-layout',
   standalone: true,
@@ -73,15 +74,28 @@ import { CommonModule } from '@angular/common';
 export class PublicLayoutComponent implements OnInit {
   airlineAlias: string = '';
   airlineName: string = '';
-
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private airlineService: AirlineService) {}
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.airlineAlias = params['airlineAlias'];
-      // TODO: Backend integration - Get airline info by alias
-      // Example: this.airlineService.getAirlineByAlias(this.airlineAlias).subscribe(airline => this.airlineName = airline.name);
-      this.airlineName = this.formatAirlineName(this.airlineAlias);
+      
+      // Obtener información real de la aerolínea desde GraphQL
+      this.airlineService.getAirlineByAlias(this.airlineAlias).subscribe({
+        next: (airline) => {
+          if (airline) {
+            this.airlineName = airline.name;
+          } else {
+            // Fallback si no se encuentra la aerolínea
+            this.airlineName = this.formatAirlineName(this.airlineAlias);
+          }
+        },
+        error: (error) => {
+          console.error('Error obteniendo aerolínea:', error);
+          // Fallback en caso de error
+          this.airlineName = this.formatAirlineName(this.airlineAlias);
+        }
+      });
     });
   }
 
