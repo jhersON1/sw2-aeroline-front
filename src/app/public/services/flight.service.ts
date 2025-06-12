@@ -137,9 +137,9 @@ export class FlightService {
   searchFlights(origin: string, destination: string, departureDate: string, passengers: number): Flight[] {
     // TODO: Backend integration - Replace with API call
     // Example: return this.http.post('/api/flights/search', { origin, destination, departureDate, passengers });
-    
-    return this.mockFlights.filter(flight => 
-      flight.origin.code === origin && 
+
+    return this.mockFlights.filter(flight =>
+      flight.origin.code === origin &&
       flight.destination.code === destination &&
       flight.availableSeats >= passengers
     );
@@ -161,7 +161,7 @@ export class FlightService {
   processPayment(paymentInfo: PaymentInfo): Promise<boolean> {
     // TODO: Backend integration - Replace with real payment processing
     // Example: return this.http.post('/api/payment/process', paymentInfo);
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(true); // Simulate successful payment
@@ -172,7 +172,7 @@ export class FlightService {
   confirmBooking(booking: BookingData): Promise<BookingData> {
     // TODO: Backend integration - Replace with API call to save booking
     // Example: return this.http.post('/api/bookings/confirm', booking);
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(booking);
@@ -183,7 +183,7 @@ export class FlightService {
   getBookingByReference(reference: string): Promise<BookingData | null> {
     // TODO: Backend integration - Replace with API call
     // Example: return this.http.get(`/api/bookings/${reference}`);
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
         const currentBooking = this.getCurrentBooking();
