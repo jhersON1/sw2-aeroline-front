@@ -15,15 +15,24 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes, withHashLocation()),
-    provideHttpClient(withFetch()),
-    provideApollo(() => {
+    provideHttpClient(withFetch()),    provideApollo(() => {
       const httpLink = inject(HttpLink);
 
       return {
         link: httpLink.create({
-          uri: 'http://localhost:8081/graphql', // ← URL del microservicio de vuelos
+          uri: 'http://localhost:8081/graphql', // URL del microservicio dockerizado local
         }),
-        cache: new InMemoryCache(),
+        cache: new InMemoryCache({
+          addTypename: false // Desactivar __typename para evitar conflictos
+        }),
+        defaultOptions: {
+          watchQuery: {
+            errorPolicy: 'all'
+          },
+          query: {
+            errorPolicy: 'all'
+          }
+        }
       };
     }),
   ],

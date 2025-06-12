@@ -42,6 +42,7 @@ export interface CreateFlightRequest {
   arrivalTime: string;
   price: number;
   status: string;
+  userId?: string; // Opcional para compatibilidad
 }
 
 export interface UpdateFlightRequest extends CreateFlightRequest {
@@ -219,11 +220,22 @@ export class FlightAdminService {
     );
   }  /**
    * Crea un nuevo vuelo
-   */
-  createFlight(flightData: CreateFlightRequest): Observable<FlightAdmin> {
+   */  createFlight(flightData: CreateFlightRequest): Observable<FlightAdmin> {
     console.log('📤 Datos del vuelo a crear:', flightData);
     
-    const input = {
+    // Validaciones más estrictas
+    if (!flightData.airlineId) {
+      throw new Error('airlineId es requerido para crear un vuelo');
+    }
+    if (!flightData.aircraftId) {
+      throw new Error('aircraftId es requerido para crear un vuelo');
+    }
+    if (!flightData.originId) {
+      throw new Error('originId es requerido para crear un vuelo');
+    }
+    if (!flightData.destinationId) {
+      throw new Error('destinationId es requerido para crear un vuelo');
+    }    const input = {
       code: flightData.code,
       airlineId: flightData.airlineId,
       aircraftId: flightData.aircraftId,
@@ -231,27 +243,64 @@ export class FlightAdminService {
       destinationId: flightData.destinationId,
       departureTime: flightData.departureTime,
       arrivalTime: flightData.arrivalTime,
-      price: flightData.price,
-      status: flightData.status
+      price: parseFloat(flightData.price.toString()), // Asegurar que sea número
+      status: flightData.status || 'PROGRAMADO',
+      userId: flightData.userId || 'admin-user-id' // Usuario admin por defecto
     };
 
-    console.log('📤 Input para GraphQL:', input);
-    
-    // Validar que airlineId esté presente
-    if (!input.airlineId) {
-      throw new Error('airlineId es requerido para crear un vuelo');
-    }
+    console.log('📤 Input validado para GraphQL:', input);
+    console.log('📤 Tipos de datos:', {
+      code: typeof input.code,
+      airlineId: typeof input.airlineId,
+      aircraftId: typeof input.aircraftId,
+      originId: typeof input.originId,
+      destinationId: typeof input.destinationId,
+      departureTime: typeof input.departureTime,
+      arrivalTime: typeof input.arrivalTime,
+      price: typeof input.price,
+      status: typeof input.status
+    });
 
     return this.apollo.mutate<{ createFlight: FlightAdmin }>({
       mutation: CREATE_FLIGHT,
       variables: { input },
-      refetchQueries: [{ query: GET_ALL_FLIGHTS }]
+      errorPolicy: 'all' // Capturar tanto errores de red como de GraphQL
     }).pipe(
       map(result => {
-        if (result.errors) {
-          throw new Error(result.errors[0].message);
+        console.log('📡 Respuesta completa del servidor:', result);
+        
+        if (result.errors && result.errors.length > 0) {
+          console.error('❌ Errores de GraphQL:', result.errors);
+          throw new Error(`Error del servidor: ${result.errors[0].message}`);
         }
-        return result.data!.createFlight;
+        
+        if (!result.data?.createFlight) {
+          console.error('❌ No se recibió data del servidor');
+          throw new Error('No se recibió respuesta válida del servidor');
+        }
+        
+        console.log('✅ Vuelo creado exitosamente:', result.data.createFlight);
+        return result.data.createFlight;
+      }),
+      catchError(error => {
+        console.error('❌ Error completo en createFlight:', error);
+        console.error('❌ Tipo de error:', error.constructor.name);
+        console.error('❌ Message:', error.message);
+        console.error('❌ GraphQL errors:', error.graphQLErrors);
+        console.error('❌ Network error:', error.networkError);
+        
+        // Re-lanzar con mensaje más descriptivo
+        let errorMessage = 'Error desconocido al crear el vuelo';
+        
+        if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+          errorMessage = `Error de GraphQL: ${error.graphQLErrors[0].message}`;
+        } else if (error.networkError) {
+          errorMessage = `Error de red: ${error.networkError.message}`;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        throw new Error(errorMessage);
       })
     );
   }

@@ -174,7 +174,6 @@ export class FlightService {
    * Buscar vuelos usando GraphQL con fallback confiable
    */  searchFlights(origin: string, destination: string, departureDate: string, passengers: number): Observable<Flight[]> {
     console.log(`🔍 Búsqueda de vuelos: ${origin} → ${destination} el ${departureDate} para ${passengers} pasajeros`);
-    console.log('🔄 Usando datos mock directamente para mejor rendimiento');
     
     // Guardar parámetros de búsqueda para uso posterior
     this.lastSearchParams = {
@@ -185,18 +184,7 @@ export class FlightService {
       tripType: 'oneWay' // Por defecto
     };
     
-    // Usar datos mock directamente para evitar problemas de UI
-    // Comentar las siguientes líneas para volver a usar GraphQL cuando esté listo
-    return of(this.getMockSearchFlights(origin, destination, passengers)).pipe(
-      delay(100), // Simular tiempo de búsqueda muy corto
-      map(flights => {
-        console.log(`✅ Vuelos mock encontrados (${flights.length} resultados):`, flights);
-        return flights;
-      })
-    );
-    
-    /*
-    // Versión GraphQL - descomentar cuando esté funcionando correctamente
+    // Usar GraphQL para obtener vuelos reales creados por el admin
     const formattedDate = `${departureDate}T10:00:00`;
     
     return this.apollo.watchQuery<{ searchFlights: Flight[] }>({
@@ -207,9 +195,9 @@ export class FlightService {
         departureDate: formattedDate
       },
       errorPolicy: 'all',
-      fetchPolicy: 'cache-first'
+      fetchPolicy: 'cache-and-network' // Siempre buscar datos frescos
     }).valueChanges.pipe(
-      timeout(3000),
+      timeout(5000),
       map((result: any) => {
         console.log('📡 Respuesta de GraphQL:', result);
         
@@ -230,6 +218,15 @@ export class FlightService {
       catchError((error: any) => {
         console.error('❌ Error en Apollo query:', error);
         return of(this.getMockSearchFlights(origin, destination, passengers));
+      })
+    );    
+    /*
+    // Versión mock - mantener como fallback en caso de errores
+    return of(this.getMockSearchFlights(origin, destination, passengers)).pipe(
+      delay(100), 
+      map(flights => {
+        console.log(`✅ Vuelos mock encontrados (${flights.length} resultados):`, flights);
+        return flights;
       })
     );
     */

@@ -127,12 +127,12 @@ const GET_AIRLINES = gql`
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">
                   Estado *
-                </label>
-                <select formControlName="status"
+                </label>                <select formControlName="status"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                   <option value="PROGRAMADO">Programado</option>
-                  <option value="RETRASADO">Retrasado</option>
+                  <option value="DEMORADO">Demorado</option>
                   <option value="CANCELADO">Cancelado</option>
+                  <option value="FINALIZADO">Finalizado</option>
                 </select>
               </div>
             </div>
@@ -319,20 +319,23 @@ export class FlightCreateComponent implements OnInit {
       status: ['PROGRAMADO', Validators.required]
     });
   }
-
   loadAirlines() {
     this.apollo.watchQuery<{ allAirlines: Airline[] }>({
-      query: GET_AIRLINES
+      query: GET_AIRLINES,
+      fetchPolicy: 'no-cache' // Forzar carga desde servidor
     }).valueChanges.subscribe({
       next: (result) => {
+        console.log('🏢 Aerolíneas cargadas desde servidor:', result.data?.allAirlines);
         this.airlines = result.data?.allAirlines || [];
         // Establecer BOA como aerolínea por defecto si existe
         const boaAirline = this.airlines.find(airline => airline.alias.toLowerCase() === 'boa');
         if (boaAirline) {
           this.flightForm.patchValue({ airlineId: boaAirline.id });
+          console.log('✅ BOA establecida como aerolínea por defecto:', boaAirline.id);
         } else if (this.airlines.length > 0) {
           // Si no existe BOA, usar la primera aerolínea disponible
           this.flightForm.patchValue({ airlineId: this.airlines[0].id });
+          console.log('✅ Primera aerolínea establecida por defecto:', this.airlines[0].id);
         }
       },
       error: (error) => {
@@ -346,12 +349,13 @@ export class FlightCreateComponent implements OnInit {
       }
     });
   }
-
   loadAirports() {
     this.apollo.watchQuery<{ allAirports: Airport[] }>({
-      query: GET_AIRPORTS
+      query: GET_AIRPORTS,
+      fetchPolicy: 'no-cache' // Forzar carga desde servidor
     }).valueChanges.subscribe({
       next: (result) => {
+        console.log('🛫 Aeropuertos cargados desde servidor:', result.data?.allAirports);
         this.airports = result.data?.allAirports || [];
       },
       error: (error) => {
@@ -366,12 +370,13 @@ export class FlightCreateComponent implements OnInit {
       }
     });
   }
-
   loadAircrafts() {
     this.apollo.watchQuery<{ allAircraft: Aircraft[] }>({
-      query: GET_AIRCRAFT
+      query: GET_AIRCRAFT,
+      fetchPolicy: 'no-cache' // Forzar carga desde servidor
     }).valueChanges.subscribe({
       next: (result) => {
+        console.log('✈️ Aeronaves cargadas desde servidor:', result.data?.allAircraft);
         this.aircrafts = result.data?.allAircraft || [];
       },
       error: (error) => {
@@ -414,17 +419,28 @@ export class FlightCreateComponent implements OnInit {
         status: formValues.status
       };
 
-      console.log('📤 Datos finales a enviar:', flightData);
-
-      this.flightAdminService.createFlight(flightData).subscribe({
+      console.log('📤 Datos finales a enviar:', flightData);      this.flightAdminService.createFlight(flightData).subscribe({
         next: (flight) => {
-          console.log('Vuelo creado exitosamente:', flight);
+          console.log('✅ Vuelo creado exitosamente:', flight);
+          this.loading = false;
           this.router.navigate(['/admin/flights']);
         },
         error: (error) => {
-          console.error('Error creating flight:', error);
+          console.error('❌ Error detallado al crear vuelo:', error);
           this.loading = false;
-          // TODO: Mostrar mensaje de error al usuario
+          
+          // Mostrar error más específico
+          let errorMessage = 'Error desconocido al crear el vuelo';
+          
+          if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          alert(`Error al crear vuelo: ${errorMessage}`);
+          
+          // Log adicional para debugging
+          console.error('❌ Stack trace:', error.stack);
+          console.error('❌ Datos que causaron el error:', flightData);
         }
       });
     } else {
